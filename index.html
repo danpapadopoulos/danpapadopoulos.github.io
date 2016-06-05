@@ -1,8 +1,11 @@
 <!DOCTYPE html>
 <!--
-To change this license header, choose License Headers in Project Properties.
-To change this template file, choose Tools | Templates
-and open the template in the editor.
+Daniel Papadopoulos
+June 5th, 2016
+Javascript programming challenge
+This is a two player racing game that is time based
+if players veer off of the track then their clock starts to run more quickly 
+First one to finish the track in a certain number of laps wins!
 -->
 <html>
     <head>
@@ -17,273 +20,261 @@ and open the template in the editor.
                 margin-right: auto;
                 display: block;
                 width: 800px;
-                
+
             }
         </style>
         <script>
-            var ctx;
-            var WIDTH;
-            var HEIGHT;
-            var stage
-            var count;
-            var colourP;
-            var maxLaps;
+            var ctx; //defines the ctx variable for drawing on the canvas
+            var WIDTH; //variable for the width of the canvas
+            var HEIGHT; //variable for the height of the canvas
+            var stage; //variable for which stage of the game to be displaying on the canvas
+            var count; //variable for timing the intro sequence of the main game
+            var colourP; //variable for a set of data containing the colour the point the player is on
+            var maxLaps; //variable for determining the max number of laps
 
-            var rightP1 = false;
-            var leftP1 = false;
-            var upP1 = false;
-            var downP1 = false;
-            var xP1;
-            var yP1;
-            var rotP1;
-            var timeP1;
-            var secondsP1;
-            var milSecondsP1;
-            var mSecondsP1; //formated version
-            var greenP1;
-            var lapP1 = false;
-            var numLapP1;
-            var stopClockP1 = false;
-            var moveP1 = true;
-            
-            var rightP2 = false;
-            var leftP2 = false;
-            var upP2 = false;
-            var downP2 = false;
-            var xP2;
-            var yP2;
-            var rotP2;
-            var timeP2;
-            var secondsP2;
-            var milSecondsP2;
-            var mSecondsP2; //formated version
-            var greenP2;
-            var lapP2 = false;
-            var numLapP2;
-            var stopClockP2 = false;
-            var moveP2 = true;
-            
-            var timing;
-            
-            var carSpeed;
-            
-            var colourTrack = "#101010";
-            var colourBack = "#00D000";
-            var colourMenu = "#E6F7FF";
-            var img = new Image(); //http://images.clipartpanda.com/formula-clipart-auto_racing_-_car_04.gif
-            
-            var selected;
+            //player 1 variables
+            var rightP1 = false; //boolean for whether P1 is turning right or not
+            var leftP1 = false; //boolean for whether P1 is turning left or not
+            var upP1 = false; //boolean for whether P1 is moving forward or not
+            var downP1 = false; //boolean for whether P1 is moving backward or not
+            var xP1; //variable for where P1 is in the x direction
+            var yP1; //variable for where P1 is in the y direction
+            var rotP1; //variable for the rotation of P1
+            var milSecondsP1; //variable for counting how long P1 has taken
+            var mSecondsP1; //formated version of milSecondsP1
+            var greenP1; //variable for whether P1 is on the grass or not
+            var lapP1 = false; //boolean for whether P1 is on the lap line or not
+            var numLapP1; //variable for how many laps P1 has made
+            var stopClockP1 = false; //boolean for whether to keep running P1's clock or not
+            var moveP1 = true; //boolean for whether to allow P1 to move or not
+
+            //player 2 variables
+            var rightP2 = false; //boolean for whether P2 is turning right or not
+            var leftP2 = false; //boolean for whether P2 is turning left or not
+            var upP2 = false; //boolean for whether P2 is moving forward or not
+            var downP2 = false; //boolean for whether P2 is moving backward or not
+            var xP2; //variable for where P2 is in the x direction
+            var yP2; //variable for where P2 is in the y direction
+            var rotP2; //variable for the rotation of P2
+            var milSecondsP2; //variable for counting how long P2 has taken
+            var mSecondsP2; //formated version of milSecondsP2
+            var greenP2; //variable for whether P2 is on the grass or not
+            var lapP2 = false; //boolean for whether P2 is on the lap line or not
+            var numLapP2; //variable for how many laps P2 has made
+            var stopClockP2 = false; //boolean for whether to keep running P2's clock or not
+            var moveP2 = true; //boolean for whether to allow P2 to move or not
+
+            var timing; //variable for defining how long one frame is in terms of seconds for the clock at 60fps
+
+            var carSpeed; //variable for defining the speed of the cars
+
+            var colourTrack = "#101010"; //colour for the track
+            var colourBack = "#00D000"; //colour for the grass
+            var colourMenu = "#E6F7FF"; //colour for the menu background
+            var img = new Image(); //http://images.clipartpanda.com/formula-clipart-auto_racing_-_car_04.gif source of image
+
+            var selected; //variable to keep track of which menu item is selected
 
 
-            function init() {
-                ctx = document.getElementById('my_canvas').getContext('2d');
-                WIDTH = ctx.canvas.width;
-                HEIGHT = ctx.canvas.height;
-                stage = 0;
-                count = -1;
-                timing = 1/60;
-                carSpeed = 4;
-                selected = 1;
-                img.src = 'racecar.png';
+            function init() { //function to run once the window is loaded
+                ctx = document.getElementById('my_canvas').getContext('2d'); //setup the ctx for drawing on the canvas
+                WIDTH = ctx.canvas.width; //set the WIDTH = to the width of the canvas
+                HEIGHT = ctx.canvas.height; //set the HEIGHT = to the height of the canvas
+                stage = 0; //init stage is 0 or the menu screen
+                count = -1; //counter starts at -1
+                timing = 1 / 60; //timing constant is equal to the number of seconds in one frame at 60fps
+                carSpeed = 4; //car speed is 4
+                selected = 1; //selected the first item on the menu
+                img.src = 'racecar.png'; //import the racecar image
 
-                rotP1 = -(Math.atan(325/400));
-                xP1 = 314;
-                yP1 = 370;
-                timeP1 = "";
-                secondsP1 = 0;
-                milSecondsP1 = 0;
-                numLapP1 = 0;
-                moveP1 = true;
-                stopClockP1 = false;
-                
-                rotP2 = -(Math.atan(325/400));
-                xP2 = 350;
-                yP2 = 400;
-                timeP2 = "";
-                secondsP2 = 0;
-                milSecondsP2 = 0;
-                numLapP2 = 0;
-                moveP2 = true;
-                stopClockP2= false;
-                
-                alert("Please use the arrow keys and enter to navigate this menu");
-                
-                draw();
+                //set P1 values
+                rotP1 = -(Math.atan(325 / 400)); //init rotation of P1 to be exactly parallel to the track
+                xP1 = 314; //init the x-pos of P1
+                yP1 = 370; //init the y-pos of P1
+                milSecondsP1 = 0; //start the clock at 0
+                numLapP1 = 0; //start P1's num of laps at 0
+                moveP1 = true; //allow P1 to move 
+                stopClockP1 = false; //keep the clock running
+
+                //set P2 values
+                rotP2 = -(Math.atan(325 / 400)); //init rotation of P2 to be exactly parallel to the track
+                xP2 = 350; //init the x-pos of P1
+                yP2 = 400; //init the y-pos of P1
+                milSecondsP2 = 0; //start the clock at 0
+                numLapP2 = 0; //start P2's num of laps at 0
+                moveP2 = true; //allow P2 to move
+                stopClockP2 = false; //keep the clock running
+
+                alert("Please use the arrow and enter keys to navigate this menu");
+
+                draw(); //start the draw function
             }
 
-            function clear(colour) {
-                ctx.fillStyle = colour;
-                rect(0, 0, WIDTH, HEIGHT);
+            function clear(colour) { //clear screen function with a passed variable for colour
+                ctx.fillStyle = colour; //fills with the passed colour
+                ctx.fillRect(0, 0, WIDTH, HEIGHT);
             }
 
-            function rect(x, y, w, h) {
+            function drawButton(height, text, selected) {
+                //create the button rectangle
                 ctx.beginPath();
-                ctx.rect(x, y, w, h);
-                ctx.closePath();
+                ctx.fillStyle = "#505050"; //dark grey
+                ctx.rect((WIDTH / 2) - 180, height, 360, 60)
                 ctx.fill();
-            }
-            
-            function drawButton(height, text, selected){
-                ctx.beginPath();
-                ctx.fillStyle = "#505050";
-                ctx.rect((WIDTH/2)-180, height, 360, 60)
-                ctx.fill();
-                ctx.strokeStyle = "#202020";
-                ctx.lineWidth = 4;
+                ctx.strokeStyle = "#202020"; //even darker grey
+                ctx.lineWidth = 4; //stroke weight
                 ctx.stroke();
-                
+
                 ctx.font = "50px Helvetica";
-                if (selected){
-                    ctx.fillStyle = "white";
-                }else{
-                    ctx.fillStyle = "orange";
+                if (selected) { //checks to see if the button is selected
+                    ctx.fillStyle = "white"; //if it is then fills the text as white
+                } else {
+                    ctx.fillStyle = "orange"; //if not then makes the text orange
                 }
-                ctx.textAlign = "center";
-                ctx.fillText(text, WIDTH/2, height+50);
+                ctx.textAlign = "center"; //center align
+                ctx.fillText(text, WIDTH / 2, height + 50); //writes the text
             }
-            
-            function printBigNumber(number){
+
+            function printBigNumber(number) { //prints a big number for the intro of the game by passing a String
                 ctx.font = "400px Helvetica";
                 ctx.fillStyle = "black";
-                ctx.textAlign= "center";
-                ctx.fillText(number, WIDTH/2, 400);
+                ctx.textAlign = "center";
+                ctx.fillText(number, WIDTH / 2, 400); //fill the text
                 ctx.strokeStyle = "white";
-                ctx.strokeText(number, WIDTH/2, 400);
+                ctx.strokeText(number, WIDTH / 2, 400); //strokes the text
             }
 
-            document.addEventListener('keydown', function(event) {
-                if (event.keyCode === 68) {
+            document.addEventListener('keydown', function (event) { //activates if a key is pressed down
+                if (event.keyCode === 68) { //if the key is 'd'
                     rightP1 = true;
-                }
-                else if (event.keyCode === 65) {
+                } else if (event.keyCode === 65) { //if the key is 'a'
                     leftP1 = true;
                 }
-                if (event.keyCode === 87){
+                if (event.keyCode === 87) { //if the key is 'w'
                     upP1 = true;
                     menuSelect(-1);
-                }else if (event.keyCode === 83){
+                } else if (event.keyCode === 83) { //if the key is 's'
                     downP1 = true;
                     menuSelect(1);
                 }
-                
-                if (event.keyCode === 39) {
+
+                if (event.keyCode === 39) { //if the key is 'right arrow'
                     rightP2 = true;
-                }
-                else if (event.keyCode === 37) {
+                } else if (event.keyCode === 37) { //if the key is 'left arrow'
                     leftP2 = true;
                 }
-                if (event.keyCode === 38){
+                if (event.keyCode === 38) { //if the key is 'up arrow'
                     upP2 = true;
                     menuSelect(-1);
-                }else if (event.keyCode === 40){
+                } else if (event.keyCode === 40) { //if the key is 'down arrow'
                     downP2 = true;
                     menuSelect(1);
                 }
-                if (event.keyCode === 13){
+                if (event.keyCode === 13) { //if the key is 'enter'
                     stage = selected;
                 }
-                
-                if (event.keyCode === 8){
+
+                if (event.keyCode === 8) { //if the key is 'backspace'
+
+                    //do everything from the init function without triggering the init function (it would cause window.requestAnimationFrame(draw); to run in a second instance and time would speed up)
                     stage = 0;
                     count = -1;
                     selected = 1;
-                    
-                    rotP1 = -(Math.atan(325/400));
+
+                    rotP1 = -(Math.atan(325 / 400));
                     xP1 = 314;
                     yP1 = 370;
-                    timeP1 = "";
-                    secondsP1 = 0;
                     milSecondsP1 = 0;
                     numLapP1 = 0;
                     moveP1 = true;
                     stopClockP1 = false;
 
-                    rotP2 = -(Math.atan(325/400));
+                    rotP2 = -(Math.atan(325 / 400));
                     xP2 = 350;
                     yP2 = 400;
-                    timeP2 = "";
-                    secondsP2 = 0;
                     milSecondsP2 = 0;
                     numLapP2 = 0;
                     moveP2 = true;
-                    stopClockP2= false;
+                    stopClockP2 = false;
                 }
-                
+
             });
 
-            document.addEventListener('keyup', function(event) {
-                if (event.keyCode === 68) {
+            document.addEventListener('keyup', function (event) { //activates if key is released
+                if (event.keyCode === 68) { //if key released is 'd'
                     rightP1 = false;
-                }
-                else if (event.keyCode === 65) {
+                } else if (event.keyCode === 65) { //if key released is 'a'
                     leftP1 = false;
                 }
-                if (event.keyCode === 87){
+                if (event.keyCode === 87) { //if key released is 'w'
                     upP1 = false;
-                }else if (event.keyCode === 83){
+                } else if (event.keyCode === 83) { //if key released is 's'
                     downP1 = false;
                 }
-                
-                if (event.keyCode === 39) {
+
+                if (event.keyCode === 39) { //if key released is 'right arrow'
                     rightP2 = false;
-                }
-                else if (event.keyCode === 37) {
+                } else if (event.keyCode === 37) { //is key released is 'left arrow'
                     leftP2 = false;
                 }
-                if (event.keyCode === 38){
+                if (event.keyCode === 38) { //if key released is 'up arrow'
                     upP2 = false;
-                }else if (event.keyCode === 40){
+                } else if (event.keyCode === 40) { //if key released is 'down arrow'
                     downP2 = false;
                 }
             });
 
-            function updateP1() {
-                ctx.save();
-                ctx.translate(xP1, yP1);
-                ctx.rotate(rotP1);
-                if (moveP1){
-                    if (leftP1) {
-                        rotP1 -= carSpeed/100;
-                    } else if (rightP1) {
-                        rotP1 += carSpeed/100;
+            function updateP1() { //redraw the player 1 car everytime function is called
+                ctx.save(); //save the current ctx settings
+                ctx.translate(xP1, yP1); //move the origin to the player's position
+                ctx.rotate(rotP1); //rotate the plane to match what the player should be 
+                if (moveP1) { //if the player is allowed to move
+                    if (leftP1) { //if the player is turning left
+                        rotP1 -= carSpeed / 100; //rotate at 100th of the car speed amount of radians ccw
+                    } else if (rightP1) { // if turning right
+                        rotP1 += carSpeed / 100; //rotate at 100th of the car speed amount of radians cw
                     }
-                    if (upP1){
-                        xP1 += carSpeed*Math.cos(rotP1);
-                        yP1 += carSpeed*Math.sin(rotP1);
-                    }else if (downP1){
-                        xP1 -= carSpeed*Math.cos(rotP1);
-                        yP1 -= carSpeed*Math.sin(rotP1);
-                    }
-                }
-                ctx.fillStyle = "blue";
-                ctx.fillRect(-25, -12, 50, 24);
-                ctx.restore();
-            }
-            
-            function updateP2() {
-                ctx.save();
-                ctx.translate(xP2, yP2);
-                ctx.rotate(rotP2);
-                if (moveP2){
-                    if (leftP2) {
-                        rotP2 -= carSpeed/100;
-                    } else if (rightP2) {
-                        rotP2 += carSpeed/100;
-                    }
-                    if (upP2){
-                        xP2 += carSpeed*Math.cos(rotP2);
-                        yP2 += carSpeed*Math.sin(rotP2);
-                    }else if (downP2){
-                        xP2 -= carSpeed*Math.cos(rotP2);
-                        yP2 -= carSpeed*Math.sin(rotP2);
+                    if (upP1) { // if the car is moving forward
+                        //move straight ahead based on rotation
+                        xP1 += carSpeed * Math.cos(rotP1);
+                        yP1 += carSpeed * Math.sin(rotP1);
+                    } else if (downP1) { //if the car is moving backward
+                        //move straight backward based on rotation
+                        xP1 -= carSpeed * Math.cos(rotP1);
+                        yP1 -= carSpeed * Math.sin(rotP1);
                     }
                 }
-                ctx.fillStyle = "red";
+                ctx.fillStyle = "blue"; //make P1 car blue
                 ctx.fillRect(-25, -12, 50, 24);
-                ctx.restore();
+                ctx.restore(); //return to the previous state of origin and rotation
             }
-            
-            function generateTrack(){
+
+            function updateP2() { //redraw the player 2 car everytime function is called
+                ctx.save(); //save the current ctx settings
+                ctx.translate(xP2, yP2); //move the origin to the player's position
+                ctx.rotate(rotP2); //rotate the plane to match what the player should be 
+                if (moveP2) { //if the player is allowed to move
+                    if (leftP2) { //if the player is turning left
+                        rotP2 -= carSpeed / 100; //rotate at 100th of the car speed amount of radians ccw
+                    } else if (rightP2) { // if turning right
+                        rotP2 += carSpeed / 100; //rotate at 100th of the car speed amount of radians cw
+                    }
+                    if (upP2) { // if the car is moving forward
+                        //move straight ahead based on rotation
+                        xP2 += carSpeed * Math.cos(rotP2);
+                        yP2 += carSpeed * Math.sin(rotP2);
+                    } else if (downP2) { //if the car is moving backward
+                        //move straight backward based on rotation
+                        xP2 -= carSpeed * Math.cos(rotP2);
+                        yP2 -= carSpeed * Math.sin(rotP2);
+                    }
+                }
+                ctx.fillStyle = "red"; //make P2 car blue
+                ctx.fillRect(-25, -22, 50, 24);
+                ctx.restore(); //return to the previous state of origin and rotation
+            }
+
+            function generateTrack() {
                 clear(colourBack);
                 //left curved track part
                 ctx.beginPath();
@@ -297,7 +288,7 @@ and open the template in the editor.
                 ctx.moveTo(200, 230);
                 ctx.bezierCurveTo(90, 155, 90, 505, 200, 430);
                 ctx.fill();
-                
+
                 //right curved track part
                 ctx.beginPath();
                 ctx.fillStyle = colourTrack;
@@ -310,7 +301,7 @@ and open the template in the editor.
                 ctx.moveTo(600, 230);
                 ctx.bezierCurveTo(710, 155, 710, 505, 600, 430);
                 ctx.fill();
-                
+
                 //cross roads
                 ctx.beginPath();
                 ctx.fillStyle = colourTrack;
@@ -319,14 +310,14 @@ and open the template in the editor.
                 ctx.lineTo(600, 555);
                 ctx.lineTo(200, 230);
                 ctx.fill();
-                
+
                 ctx.beginPath();
                 ctx.moveTo(200, 430);
                 ctx.lineTo(600, 105);
                 ctx.lineTo(600, 230);
                 ctx.lineTo(200, 555);
                 ctx.fill();
-                
+
                 //lines on road
                 ctx.beginPath();
                 ctx.moveTo(322, 330);
@@ -334,245 +325,247 @@ and open the template in the editor.
                 ctx.lineTo(400, 393);
                 ctx.strokeStyle = "#909090";
                 ctx.stroke();
-                
+
                 ctx.beginPath();
                 ctx.moveTo(400, 267);
                 ctx.lineTo(478, 330);
                 ctx.stroke();
-                
+
+                //finish line
                 ctx.beginPath();
                 ctx.moveTo(262, 377);
                 ctx.lineTo(340, 439);
                 ctx.strokeStyle = "#404040";
                 ctx.stroke();
             }
-            
-            function updateMenuButtons(){
-                if (selected === 1){
+
+            function updateMenuButtons() { //shows and updates the menu buttons by using drawButtona and by passing the height, text, and whether it is active or not
+                if (selected === 1) { //if first button is selected
                     drawButton(380, "Start", true);
                     drawButton(450, "Instructions", false);
                     drawButton(520, "Credits", false);
-                }else if (selected === 2){
+                } else if (selected === 2) { //if second button is selected
                     drawButton(380, "Start", false);
                     drawButton(450, "Instructions", true);
                     drawButton(520, "Credits", false);
-                }else if (selected === 3){
+                } else if (selected === 3) { //if thrid button is selected
                     drawButton(380, "Start", false);
                     drawButton(450, "Instructions", false);
                     drawButton(520, "Credits", true);
-                }else if (selected > 3){
+                } else if (selected > 3) { //go back to selecting first 
                     selected = 1;
                     drawButton(380, "Start", false);
                     drawButton(450, "Instructions", false);
                     drawButton(520, "Credits", false);
-                }else if (selected < 1){
+                } else if (selected < 1) { //go back to selecting last
                     selected = 3;
                     drawButton(380, "Start", false);
                     drawButton(450, "Instructions", false);
                     drawButton(520, "Credits", false);
                 }
             }
-            
-            function updateMenuLabel(){
-                ctx.drawImage(img, WIDTH/2-(img.width/2), 65);
-        
+
+            function updateMenuLabel() {
+                ctx.drawImage(img, WIDTH / 2 - (img.width / 2), 65); //draws the racecar picture
+
+                //create the shape of the box for the title matching the style of the menu buttons (see drawButton();)
                 ctx.beginPath();
                 ctx.fillStyle = "#505050";
                 ctx.strokeStyle = "#202020";
                 ctx.lineWidth = 4;
-                ctx.rect(WIDTH/2-300, -20, 600, 80);
+                ctx.rect(WIDTH / 2 - 300, -20, 600, 80);
                 ctx.fill();
                 ctx.stroke();
-        
+
+                //text of the title matching the style of the menu buttons (see drawButton();)
                 ctx.font = "50px Helvetica";
                 ctx.fillStyle = "orange";
                 ctx.textAlign = "center";
-                ctx.fillText("Racecar Simulator 2016", WIDTH/2, 50);
-                
-                
-                
+                ctx.fillText("Racecar Simulator 2016", WIDTH / 2, 50);
             }
-            
-            function menuSelect(direction){
-                selected += direction;
+
+            function menuSelect(direction) {
+                selected += direction; //depending on whether menuSelect was passed a 1 or -1 will depend on whether selection will move up or down (see key down function)
             }
-            
-            function trackStartUp(){
-                generateTrack();
-                if (count === -1){
+
+            function trackStartUp() { //this code will loop while the game is starting up
+                if (count === -1) { //init function sets the count to -1 so the program will the user how many laps they want to play for
                     maxLaps = prompt("Welcome!\nHow many laps do you want to race for? (whole number)");
-                }else if (count<60){
+                } else if (count < 60) { //for one second display a 3 using printBigNumber function
                     printBigNumber("3");
-                }else if (count<120){
+                } else if (count < 120) { // for one second display a 2 using printBigNumber function
                     printBigNumber("2");
-                }else if (count<180){
+                } else if (count < 180) { //for one second display a 1 using printBigNumber function
                     printBigNumber("1");
-                }else if (count<240){
+                } else if (count < 240) { //for one second display a Go! using printBigNumber function
                     printBigNumber("Go!");
                 }
-                count++;
+                count++; //increase count everytime looped (60 times in 1 second means a count of 60 is one second)
             }
-            
-            function updateClocks(){
-                if (stopClockP1 === false){   
-                    milSecondsP1 += timing;
-                    
-                    
-                    greenP1 = checkForGreen(xP1, yP1);
-                    if (greenP1){
-                        milSecondsP1 += timing*3;
-                    }
 
-                    
-                }
-                if (stopClockP2 === false){
-                    milSecondsP2 += timing;
-                
-                    greenP2 = checkForGreen(xP2, yP2)
-                    if (greenP2){
-                        milSecondsP2 += timing*3;
+            function updateClocks() { //gets the clocks that run in the top corners
+                if (stopClockP1 === false) { //as long as the clock for P1 still should keep running
+                    milSecondsP1 += timing; //increase it by 1/60 of a second
+                    greenP1 = checkForGreen(xP1, yP1); //check to see if the player is on the grass
+                    if (greenP1) { //if the player is
+                        milSecondsP1 += timing * 3; //count another 3 times for 4x speed
                     }
                 }
+                if (stopClockP2 === false) { //as long as the clock for P1 still should keep running
+                    milSecondsP2 += timing; //increase it by 1/60 of a second
+                    greenP2 = checkForGreen(xP2, yP2) //check to see if the player is on the grass
+                    if (greenP2) { // if the player is
+                        milSecondsP2 += timing * 3; //count another 3 times for 4x speed
+                    }
+                }
+                //format the time to 3 decimal places
                 mSecondsP1 = milSecondsP1.toFixed(3);
                 mSecondsP2 = milSecondsP2.toFixed(3);
-                
-                
+
+                //print the clock in the upper left in blue for P1
                 ctx.font = "40px Helvetica";
                 ctx.fillStyle = "blue";
-                ctx.textAlign= "left";
+                ctx.textAlign = "left";
                 ctx.fillText(mSecondsP1, 20, 40);
-                
+
+                //print the clock in the upper right in red for P2
                 ctx.fillStyle = "red";
                 ctx.fillText(mSecondsP2, 655, 40);
-                
-            }
-            
-            function checkForGreen(x, y){
-                colourP = ctx.getImageData(x, y, 1, 1);
-                if (colourP.data[1] > 200){
-                    return true;
-                }else{
-                    return false;
-                }
-            }
-            
-            function checkForLap(x, y){
-                colourP = ctx.getImageData(x, y, 1, 1);
-                if (colourP.data[0] === 64){
-                    return true;
-                }else{
-                    return false;
-                }
-            }
-            
-            function updateLap(){
-                if (lapP1 === false){
-                    lapP1 = checkForLap(xP1, yP1);
-                    if (lapP1 === true){
-                        numLapP1++;
-                    }
-                }else{
-                    lapP1 = checkForLap(xP1, yP1);
-                }
-                if (lapP2 === false){
-                    lapP2 = checkForLap(xP2, yP2);
-                    if (lapP2 === true){
-                        numLapP2++;
-                    }
-                }else{
-                    lapP2 = checkForLap(xP2, yP2);
-                }
-                
-                ctx.font = "40px Helvetica";
-                ctx.fillStyle = "blue";
-                ctx.textAlign= "center";
-                ctx.fillText("Lap: "+numLapP1, WIDTH/2, 40);
-                
-                ctx.fillStyle = "red";
-                ctx.fillText("Lap: "+numLapP2, WIDTH/2, 80);
-                
-            }
-            
-            function checkIfFinishedRace(){
-                if (numLapP1 >= maxLaps){
-                    stopClockP1 = true;
-                    moveP1 = false;
-                }
-                
-                if (numLapP2 >= maxLaps){
-                    stopClockP2 = true;
-                    moveP2 = false;
-                }
-                
-                if(moveP1 === false && moveP2 === false){
-                    ctx.font = "50px Helvetica";
-                    ctx.fillStyle = "black";
-                    ctx.textAlign= "center";
-                    ctx.strokeStyle = "white";
-                    ctx.lineWidth = 2;
-                    ctx.fillText("Good Game!", WIDTH/2, 200);
-                    ctx.fillText("Press 'BACKSPACE' to return", WIDTH/2, 300);
-                    ctx.strokeText("Good Game!", WIDTH/2, 200);
-                    ctx.strokeText("Press 'BACKSPACE' to return", WIDTH/2, 300);
-                }
-                
-            }
-            
-            function generateInstructions(){
-                ctx.font = "30px Helvetica";
-                ctx.fillStyle = "black";
-                ctx.textAlign= "center";
-                ctx.fillText("Welcome!", WIDTH/2, 60);
-                ctx.fillText("Player 1 is blue and uses WASD to move", WIDTH/2, 130);
-                ctx.fillText("Player 2 is red and uses the arrow keys to move", WIDTH/2, 200);
-                ctx.fillText("If you travel on the grass, then your timer will", WIDTH/2, 270);
-                ctx.fillText("count 4x as fast", WIDTH/2, 320);
-                ctx.fillText("Complete the laps as quickly as possible and", WIDTH/2, 390);
-                ctx.fillText("have fun!", WIDTH/2, 440);
-                ctx.fillText("Press 'BACKSPACE' to return", WIDTH/2, 540);
-                
-            }
-            
-            function generateCredits(){
-                ctx.font = "30px Helvetica";
-                ctx.fillStyle = "black";
-                ctx.textAlign= "center";
-                ctx.fillText("This game was made by Daniel Papadopoulos", WIDTH/2, 200);
-                ctx.fillText("Press 'BACKSPACE' to return", WIDTH/2, 540);
-                
-            }
-            
-            function draw() {
-                if (stage === 0){
-                    clear(colourMenu);
-                    updateMenuLabel();
-                    updateMenuButtons();
-                }else if (stage === 1){
-                    if (count < 240){
-                        trackStartUp();
-                    }else{
-                        generateTrack();
-                        updateClocks();
-                        updateLap();
-                        updateP1();
-                        updateP2();
-                        checkIfFinishedRace();
-                    }
-                }else if (stage === 2){
-                    clear(colourMenu);
-                    generateInstructions();
-                }else if (stage === 3){
-                    clear(colourMenu);
-                    generateCredits();
-                }
-                window.requestAnimationFrame(draw);
+
             }
 
-            window.onload = init;
+            function checkForGreen(x, y) { //checks to see if the canvas at a cetian point is green (passing player's position)
+                colourP = ctx.getImageData(x, y, 1, 1); //data of colour at x and y
+                if (colourP.data[1] > 200) { //if the green component is greater than 200 (only spot is on the grass) then return true
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+
+            function checkForLap(x, y) { //checks to see if the player is on top of the lap marker
+                colourP = ctx.getImageData(x, y, 1, 1); // checks the colour of the pixel on the canvas at x and y
+                if (colourP.data[0] === 64) { //if the red component of that point is equal to 64 (lap marker line) then return true
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+
+            function updateLap() { //this function makes sure that the lap does not continually update while the player is on the line
+                if (lapP1 === false) {
+                    lapP1 = checkForLap(xP1, yP1);
+                    if (lapP1 === true) {
+                        numLapP1++;
+                    }
+                } else {
+                    lapP1 = checkForLap(xP1, yP1);
+                }
+                if (lapP2 === false) {
+                    lapP2 = checkForLap(xP2, yP2);
+                    if (lapP2 === true) {
+                        numLapP2++;
+                    }
+                } else {
+                    lapP2 = checkForLap(xP2, yP2);
+                }
+
+                //prints P1's number of completed laps
+                ctx.font = "40px Helvetica";
+                ctx.fillStyle = "blue";
+                ctx.textAlign = "center";
+                ctx.fillText("Lap: " + numLapP1, WIDTH / 2, 40);
+                
+                //prints P2's number of completed laps
+                ctx.fillStyle = "red";
+                ctx.fillText("Lap: " + numLapP2, WIDTH / 2, 80);
+
+            }
+
+            function checkIfFinishedRace() { //this function checks to see if both players have finished the race and if either have finished their own laps
+                if (numLapP1 >= maxLaps) { //if P1 has completed all of their laps
+                    stopClockP1 = true; //stop the clock
+                    moveP1 = false; //stop them moving
+                }
+
+                if (numLapP2 >= maxLaps) { //if P2 has completed all of their laps
+                    stopClockP2 = true; //stop the clock
+                    moveP2 = false; //stop them moving
+                }
+
+                if (moveP1 === false && moveP2 === false) { //if both players are no longer moving
+                    //print the gameover text
+                    ctx.font = "50px Helvetica";
+                    ctx.fillStyle = "black";
+                    ctx.textAlign = "center";
+                    ctx.strokeStyle = "white";
+                    ctx.lineWidth = 2;
+                    ctx.fillText("Good Game!", WIDTH / 2, 200);
+                    ctx.fillText("Press 'BACKSPACE' to return", WIDTH / 2, 300);
+                    ctx.strokeText("Good Game!", WIDTH / 2, 200);
+                    ctx.strokeText("Press 'BACKSPACE' to return", WIDTH / 2, 300);
+                }
+
+            }
+
+            function generateInstructions() { //text for the instructions screen explaining to the user how to play the game
+                ctx.font = "30px Helvetica";
+                ctx.fillStyle = "black";
+                ctx.textAlign = "center";
+                ctx.fillText("Welcome!", WIDTH / 2, 60);
+                ctx.fillText("Player 1 is blue and uses WASD to move", WIDTH / 2, 130);
+                ctx.fillText("Player 2 is red and uses the arrow keys to move", WIDTH / 2, 200);
+                ctx.fillText("If you travel on the grass, then your timer will", WIDTH / 2, 270);
+                ctx.fillText("count 4x as fast", WIDTH / 2, 320);
+                ctx.fillText("Complete the laps as quickly as possible and", WIDTH / 2, 390);
+                ctx.fillText("have fun!", WIDTH / 2, 440);
+                ctx.fillText("Press 'BACKSPACE' to return", WIDTH / 2, 540);
+
+            }
+
+            function generateCredits() { //text for the credits screen to display the author and date created
+                ctx.font = "30px Helvetica";
+                ctx.fillStyle = "black";
+                ctx.textAlign = "center";
+                ctx.fillText("This game was made by Daniel Papadopoulos", WIDTH / 2, 200);
+                ctx.fillText("June 5th, 2016", WIDTH / 2, 260);
+                ctx.fillText("ICS 3U", WIDTH / 2, 320);
+                ctx.fillText("Press 'BACKSPACE' to return", WIDTH / 2, 540);
+
+            }
+
+            function draw() { //keep looping
+                if (stage === 0) { //menu stage
+                    clear(colourMenu); //clear with menu colour
+                    updateMenuLabel(); //show the label
+                    updateMenuButtons(); //show the buttons
+                } else if (stage === 1) { //game stage
+                    if (count < 240) { //for 4 seconds display the counting sequence
+                        generateTrack(); //diplay the track in the background
+                        trackStartUp(); //run the sequence code until it finishes
+                    } else { //play the game
+                        generateTrack(); //display the track
+                        updateClocks(); //refresh the clocks
+                        updateLap(); //refresh the lap counter
+                        updateP1(); //refresh where P1 should be
+                        updateP2(); //refresh where P2 should be
+                        checkIfFinishedRace(); //check if the race is over
+                    }
+                } else if (stage === 2) { //instructions stage
+                    clear(colourMenu); //clear screen
+                    generateInstructions(); //put up instruction text
+                } else if (stage === 3) { //credits stage
+                    clear(colourMenu); //clear screen
+                    generateCredits(); //put up credit text
+                }
+                window.requestAnimationFrame(draw); //loop the draw function again
+            }
+
+            window.onload = init; //when the window finishes loading, activate the init function
         </script>
     </head>
     <body>
-        <div align="center"><canvas id="my_canvas" width="800" height="600" ></canvas></div>
-        
+        <div align="center"><canvas id="my_canvas" width="800" height="600" ></canvas></div> <!---canvas that is 800px wide and 600px tall--->
+
     </body>
 </html>
