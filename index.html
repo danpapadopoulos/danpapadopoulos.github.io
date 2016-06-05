@@ -81,7 +81,10 @@ and open the template in the editor.
                 HEIGHT = ctx.canvas.height;
                 stage = 0;
                 count = -1;
-                timing = 1000/60;
+                timing = 1/60;
+                carSpeed = 4;
+                selected = 1;
+                img.src = 'racecar.png';
 
                 rotP1 = -(Math.atan(325/400));
                 xP1 = 314;
@@ -103,12 +106,7 @@ and open the template in the editor.
                 moveP2 = true;
                 stopClockP2= false;
                 
-                carSpeed = 4;
-                
-                selected = 1;
-                
                 img.src = 'racecar.png';
-                
                 
                 draw();
             }
@@ -419,12 +417,7 @@ and open the template in the editor.
                 if (stopClockP1 === false){   
                     milSecondsP1 += timing;
                     
-                    if (milSecondsP1 >= 1000){
-                        milSecondsP1 = 0;
-                        secondsP1++;
-                    }
                     
-
                     greenP1 = checkForGreen(xP1, yP1);
                     if (greenP1){
                         milSecondsP1 += timing*3;
@@ -435,29 +428,22 @@ and open the template in the editor.
                 if (stopClockP2 === false){
                     milSecondsP2 += timing;
                 
-                    if (milSecondsP2 >= 1000){
-                        milSecondsP2 = 0;
-                        secondsP2++;
-                    }
-                
                     greenP2 = checkForGreen(xP2, yP2)
                     if (greenP2){
                         milSecondsP2 += timing*3;
                     }
                 }
-                mSecondsP1 = milSecondsP1.toFixed(0);
-                mSecondsP2 = milSecondsP2.toFixed(0);
+                mSecondsP1 = milSecondsP1.toFixed(3);
+                mSecondsP2 = milSecondsP2.toFixed(3);
                 
-                timeP1 = secondsP1+"."+mSecondsP1;
-                timeP2 = secondsP2+"."+mSecondsP2;
                 
                 ctx.font = "40px Helvetica";
                 ctx.fillStyle = "blue";
                 ctx.textAlign= "left";
-                ctx.fillText(timeP1, 20, 40);
+                ctx.fillText(mSecondsP1, 20, 40);
                 
                 ctx.fillStyle = "red";
-                ctx.fillText(timeP2, 655, 40);
+                ctx.fillText(mSecondsP2, 655, 40);
                 
             }
             
@@ -539,8 +525,8 @@ and open the template in the editor.
                 ctx.fillText("Welcome!", WIDTH/2, 60);
                 ctx.fillText("Player 1 is blue and uses WASD to move", WIDTH/2, 130);
                 ctx.fillText("Player 2 is red and uses the arrow keys to move", WIDTH/2, 200);
-                ctx.fillText("If you travel on the grass, then your time will", WIDTH/2, 270);
-                ctx.fillText("move 4x as fast", WIDTH/2, 320);
+                ctx.fillText("If you travel on the grass, then your timer will", WIDTH/2, 270);
+                ctx.fillText("count 4x as fast", WIDTH/2, 320);
                 ctx.fillText("Complete the laps as quickly as possible and", WIDTH/2, 390);
                 ctx.fillText("have fun!", WIDTH/2, 440);
                 ctx.fillText("Press 'BACKSPACE' to return", WIDTH/2, 540);
@@ -561,7 +547,6 @@ and open the template in the editor.
                     clear(colourMenu);
                     updateMenuLabel();
                     updateMenuButtons();
-                    
                 }else if (stage === 1){
                     if (count < 240){
                         trackStartUp();
@@ -591,4 +576,3 @@ and open the template in the editor.
         
     </body>
 </html>
-
