@@ -25,6 +25,10 @@ and open the template in the editor.
             var WIDTH;
             var HEIGHT;
             var stage
+            var count;
+            var colourP;
+            var maxLaps;
+
             var rightP1 = false;
             var leftP1 = false;
             var upP1 = false;
@@ -32,6 +36,15 @@ and open the template in the editor.
             var xP1;
             var yP1;
             var rotP1;
+            var timeP1;
+            var secondsP1;
+            var milSecondsP1;
+            var mSecondsP1; //formated version
+            var greenP1;
+            var lapP1 = false;
+            var numLapP1;
+            var stopClockP1 = false;
+            var moveP1 = true;
             
             var rightP2 = false;
             var leftP2 = false;
@@ -40,28 +53,55 @@ and open the template in the editor.
             var xP2;
             var yP2;
             var rotP2;
+            var timeP2;
+            var secondsP2;
+            var milSecondsP2;
+            var mSecondsP2; //formated version
+            var greenP2;
+            var lapP2 = false;
+            var numLapP2;
+            var stopClockP2 = false;
+            var moveP2 = true;
+            
+            var timing;
             
             var carSpeed;
-            var move = true;
             
             var colourTrack = "#101010";
             var colourBack = "#00D000";
             var colourMenu = "#E6F7FF";
-            var img = new Image();
+            var img = new Image(); //http://images.clipartpanda.com/formula-clipart-auto_racing_-_car_04.gif
             
             var selected;
+
+
             function init() {
                 ctx = document.getElementById('my_canvas').getContext('2d');
                 WIDTH = ctx.canvas.width;
                 HEIGHT = ctx.canvas.height;
                 stage = 0;
+                count = -1;
+                timing = 1000/60;
+
                 rotP1 = -(Math.atan(325/400));
-                xP1 = 350;
+                xP1 = 314;
                 yP1 = 370;
+                timeP1 = "";
+                secondsP1 = 0;
+                milSecondsP1 = 0;
+                numLapP1 = 0;
+                moveP1 = true;
+                stopClockP1 = false;
                 
                 rotP2 = -(Math.atan(325/400));
-                xP2 = 314;
-                yP2 = 340;
+                xP2 = 350;
+                yP2 = 400;
+                timeP2 = "";
+                secondsP2 = 0;
+                milSecondsP2 = 0;
+                numLapP2 = 0;
+                moveP2 = true;
+                stopClockP2= false;
                 
                 carSpeed = 4;
                 
@@ -69,12 +109,15 @@ and open the template in the editor.
                 
                 img.src = 'racecar.png';
                 
+                
                 draw();
             }
+
             function clear(colour) {
                 ctx.fillStyle = colour;
                 rect(0, 0, WIDTH, HEIGHT);
             }
+
             function rect(x, y, w, h) {
                 ctx.beginPath();
                 ctx.rect(x, y, w, h);
@@ -91,7 +134,7 @@ and open the template in the editor.
                 ctx.lineWidth = 4;
                 ctx.stroke();
                 
-                ctx.font = "50px Helvetica Neue";
+                ctx.font = "50px Helvetica";
                 if (selected){
                     ctx.fillStyle = "white";
                 }else{
@@ -100,6 +143,16 @@ and open the template in the editor.
                 ctx.textAlign = "center";
                 ctx.fillText(text, WIDTH/2, height+50);
             }
+            
+            function printBigNumber(number){
+                ctx.font = "400px Helvetica";
+                ctx.fillStyle = "black";
+                ctx.textAlign= "center";
+                ctx.fillText(number, WIDTH/2, 400);
+                ctx.strokeStyle = "white";
+                ctx.strokeText(number, WIDTH/2, 400);
+            }
+
             document.addEventListener('keydown', function(event) {
                 if (event.keyCode === 68) {
                     rightP1 = true;
@@ -132,7 +185,34 @@ and open the template in the editor.
                     stage = selected;
                 }
                 
+                if (event.keyCode === 8){
+                    stage = 0;
+                    count = -1;
+                    selected = 1;
+                    
+                    rotP1 = -(Math.atan(325/400));
+                    xP1 = 314;
+                    yP1 = 370;
+                    timeP1 = "";
+                    secondsP1 = 0;
+                    milSecondsP1 = 0;
+                    numLapP1 = 0;
+                    moveP1 = true;
+                    stopClockP1 = false;
+
+                    rotP2 = -(Math.atan(325/400));
+                    xP2 = 350;
+                    yP2 = 400;
+                    timeP2 = "";
+                    secondsP2 = 0;
+                    milSecondsP2 = 0;
+                    numLapP2 = 0;
+                    moveP2 = true;
+                    stopClockP2= false;
+                }
+                
             });
+
             document.addEventListener('keyup', function(event) {
                 if (event.keyCode === 68) {
                     rightP1 = false;
@@ -158,11 +238,12 @@ and open the template in the editor.
                     downP2 = false;
                 }
             });
+
             function updateP1() {
                 ctx.save();
                 ctx.translate(xP1, yP1);
                 ctx.rotate(rotP1);
-                if (move){
+                if (moveP1){
                     if (leftP1) {
                         rotP1 -= carSpeed/100;
                     } else if (rightP1) {
@@ -185,7 +266,7 @@ and open the template in the editor.
                 ctx.save();
                 ctx.translate(xP2, yP2);
                 ctx.rotate(rotP2);
-                if (move){
+                if (moveP2){
                     if (leftP2) {
                         rotP2 -= carSpeed/100;
                     } else if (rightP2) {
@@ -209,60 +290,63 @@ and open the template in the editor.
                 //left curved track part
                 ctx.beginPath();
                 ctx.fillStyle = colourTrack;
-                ctx.moveTo(200, 75);
-                ctx.bezierCurveTo(-30, 0, -30, 600, 200, 525);
+                ctx.moveTo(200, 105);
+                ctx.bezierCurveTo(-30, 30, -30, 630, 200, 555);
                 ctx.fill();
                 //left curved track interior definition
                 ctx.beginPath();
                 ctx.fillStyle = colourBack;
-                ctx.moveTo(200, 200);
-                ctx.bezierCurveTo(90, 125, 90, 475, 200, 400);
+                ctx.moveTo(200, 230);
+                ctx.bezierCurveTo(90, 155, 90, 505, 200, 430);
                 ctx.fill();
                 
                 //right curved track part
                 ctx.beginPath();
                 ctx.fillStyle = colourTrack;
-                ctx.moveTo(600, 75);
-                ctx.bezierCurveTo(830, 0, 830, 600, 600, 525);
+                ctx.moveTo(600, 105);
+                ctx.bezierCurveTo(830, 30, 830, 630, 600, 555);
                 ctx.fill();
                 //right curved track interior definition
                 ctx.beginPath();
                 ctx.fillStyle = colourBack;
-                ctx.moveTo(600, 200);
-                ctx.bezierCurveTo(710, 125, 710, 475, 600, 400);
+                ctx.moveTo(600, 230);
+                ctx.bezierCurveTo(710, 155, 710, 505, 600, 430);
                 ctx.fill();
                 
                 //cross roads
                 ctx.beginPath();
                 ctx.fillStyle = colourTrack;
-                ctx.moveTo(200, 75);
-                ctx.lineTo(600, 400);
-                ctx.lineTo(600, 525);
-                ctx.lineTo(200, 200);
+                ctx.moveTo(200, 105);
+                ctx.lineTo(600, 430);
+                ctx.lineTo(600, 555);
+                ctx.lineTo(200, 230);
                 ctx.fill();
                 
                 ctx.beginPath();
-                ctx.moveTo(200, 400);
-                ctx.lineTo(600, 75);
-                ctx.lineTo(600, 200);
-                ctx.lineTo(200, 525);
+                ctx.moveTo(200, 430);
+                ctx.lineTo(600, 105);
+                ctx.lineTo(600, 230);
+                ctx.lineTo(200, 555);
                 ctx.fill();
                 
                 //lines on road
                 ctx.beginPath();
-                ctx.moveTo(322, 300);
+                ctx.moveTo(322, 330);
                 ctx.lineWidth = 6;
-                ctx.lineTo(400, 363);
+                ctx.lineTo(400, 393);
                 ctx.strokeStyle = "#909090";
                 ctx.stroke();
                 
                 ctx.beginPath();
-                ctx.moveTo(400, 237);
-                ctx.lineWidth = 6;
-                ctx.lineTo(478, 300);
-                ctx.strokeStyle = "#909090";
+                ctx.moveTo(400, 267);
+                ctx.lineTo(478, 330);
                 ctx.stroke();
                 
+                ctx.beginPath();
+                ctx.moveTo(262, 377);
+                ctx.lineTo(340, 439);
+                ctx.strokeStyle = "#404040";
+                ctx.stroke();
             }
             
             function updateMenuButtons(){
@@ -314,6 +398,164 @@ and open the template in the editor.
             function menuSelect(direction){
                 selected += direction;
             }
+            
+            function trackStartUp(){
+                generateTrack();
+                if (count === -1){
+                    maxLaps = prompt("Welcome!\nHow many laps do you want to race for?");
+                }else if (count<60){
+                    printBigNumber("3");
+                }else if (count<120){
+                    printBigNumber("2");
+                }else if (count<180){
+                    printBigNumber("1");
+                }else if (count<240){
+                    printBigNumber("Go!");
+                }
+                count++;
+            }
+            
+            function updateClocks(){
+                if (stopClockP1 === false){   
+                    milSecondsP1 += timing;
+                    
+                    if (milSecondsP1 >= 1000){
+                        milSecondsP1 = 0;
+                        secondsP1++;
+                    }
+                    
+
+                    greenP1 = checkForGreen(xP1, yP1);
+                    if (greenP1){
+                        milSecondsP1 += timing*3;
+                    }
+
+                    
+                }
+                if (stopClockP2 === false){
+                    milSecondsP2 += timing;
+                
+                    if (milSecondsP2 >= 1000){
+                        milSecondsP2 = 0;
+                        secondsP2++;
+                    }
+                
+                    greenP2 = checkForGreen(xP2, yP2)
+                    if (greenP2){
+                        milSecondsP2 += timing*3;
+                    }
+                }
+                mSecondsP1 = milSecondsP1.toFixed(0);
+                mSecondsP2 = milSecondsP2.toFixed(0);
+                
+                timeP1 = secondsP1+"."+mSecondsP1;
+                timeP2 = secondsP2+"."+mSecondsP2;
+                
+                ctx.font = "40px Helvetica";
+                ctx.fillStyle = "blue";
+                ctx.textAlign= "left";
+                ctx.fillText(timeP1, 20, 40);
+                
+                ctx.fillStyle = "red";
+                ctx.fillText(timeP2, 655, 40);
+                
+            }
+            
+            function checkForGreen(x, y){
+                colourP = ctx.getImageData(x, y, 1, 1);
+                if (colourP.data[1] > 200){
+                    return true;
+                }else{
+                    return false;
+                }
+            }
+            
+            function checkForLap(x, y){
+                colourP = ctx.getImageData(x, y, 1, 1);
+                if (colourP.data[0] === 64){
+                    return true;
+                }else{
+                    return false;
+                }
+            }
+            
+            function updateLap(){
+                if (lapP1 === false){
+                    lapP1 = checkForLap(xP1, yP1);
+                    if (lapP1 === true){
+                        numLapP1++;
+                    }
+                }else{
+                    lapP1 = checkForLap(xP1, yP1);
+                }
+                if (lapP2 === false){
+                    lapP2 = checkForLap(xP2, yP2);
+                    if (lapP2 === true){
+                        numLapP2++;
+                    }
+                }else{
+                    lapP2 = checkForLap(xP2, yP2);
+                }
+                
+                ctx.font = "40px Helvetica";
+                ctx.fillStyle = "blue";
+                ctx.textAlign= "center";
+                ctx.fillText("Lap: "+numLapP1, WIDTH/2, 40);
+                
+                ctx.fillStyle = "red";
+                ctx.fillText("Lap: "+numLapP2, WIDTH/2, 80);
+                
+            }
+            
+            function checkIfFinishedRace(){
+                if (numLapP1 >= maxLaps){
+                    stopClockP1 = true;
+                    moveP1 = false;
+                }
+                
+                if (numLapP2 >= maxLaps){
+                    stopClockP2 = true;
+                    moveP2 = false;
+                }
+                
+                if(moveP1 === false && moveP2 === false){
+                    ctx.font = "50px Helvetica";
+                    ctx.fillStyle = "black";
+                    ctx.textAlign= "center";
+                    ctx.strokeStyle = "white";
+                    ctx.lineWidth = 2;
+                    ctx.fillText("Good Game!", WIDTH/2, 200);
+                    ctx.fillText("Press 'BACKSPACE' to return", WIDTH/2, 300);
+                    ctx.strokeText("Good Game!", WIDTH/2, 200);
+                    ctx.strokeText("Press 'BACKSPACE' to return", WIDTH/2, 300);
+                }
+                
+            }
+            
+            function generateInstructions(){
+                ctx.font = "30px Helvetica";
+                ctx.fillStyle = "black";
+                ctx.textAlign= "center";
+                ctx.fillText("Welcome!", WIDTH/2, 60);
+                ctx.fillText("Player 1 is blue and uses WASD to move", WIDTH/2, 130);
+                ctx.fillText("Player 2 is red and uses the arrow keys to move", WIDTH/2, 200);
+                ctx.fillText("If you travel on the grass, then your time will", WIDTH/2, 270);
+                ctx.fillText("move 4x as fast", WIDTH/2, 320);
+                ctx.fillText("Complete the laps as quickly as possible and", WIDTH/2, 390);
+                ctx.fillText("have fun!", WIDTH/2, 440);
+                ctx.fillText("Press 'BACKSPACE' to return", WIDTH/2, 540);
+                
+            }
+            
+            function generateCredits(){
+                ctx.font = "30px Helvetica";
+                ctx.fillStyle = "black";
+                ctx.textAlign= "center";
+                ctx.fillText("This game was made by Daniel Papadopoulos", WIDTH/2, 200);
+                ctx.fillText("Press 'BACKSPACE' to return", WIDTH/2, 540);
+                
+            }
+            
             function draw() {
                 if (stage === 0){
                     clear(colourMenu);
@@ -321,16 +563,26 @@ and open the template in the editor.
                     updateMenuButtons();
                     
                 }else if (stage === 1){
-                    generateTrack();
-                    updateP1();
-                    updateP2();
+                    if (count < 240){
+                        trackStartUp();
+                    }else{
+                        generateTrack();
+                        updateClocks();
+                        updateLap();
+                        updateP1();
+                        updateP2();
+                        checkIfFinishedRace();
+                    }
                 }else if (stage === 2){
                     clear(colourMenu);
+                    generateInstructions();
                 }else if (stage === 3){
                     clear(colourMenu);
+                    generateCredits();
                 }
                 window.requestAnimationFrame(draw);
             }
+
             window.onload = init;
         </script>
     </head>
@@ -339,3 +591,4 @@ and open the template in the editor.
         
     </body>
 </html>
+
