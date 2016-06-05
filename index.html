@@ -174,7 +174,7 @@ First one to finish the track in a certain number of laps wins!
                     stage = selected;
                 }
 
-                if (event.keyCode === 8) { //if the key is 'backspace'
+                if (event.keyCode === 48) { //if the key is '0'
 
                     //do everything from the init function without triggering the init function (it would cause window.requestAnimationFrame(draw); to run in a second instance and time would speed up)
                     stage = 0;
@@ -501,9 +501,9 @@ First one to finish the track in a certain number of laps wins!
                     ctx.strokeStyle = "white";
                     ctx.lineWidth = 2;
                     ctx.fillText("Good Game!", WIDTH / 2, 200);
-                    ctx.fillText("Press 'BACKSPACE' to return", WIDTH / 2, 300);
+                    ctx.fillText("Press '0' to return", WIDTH / 2, 300);
                     ctx.strokeText("Good Game!", WIDTH / 2, 200);
-                    ctx.strokeText("Press 'BACKSPACE' to return", WIDTH / 2, 300);
+                    ctx.strokeText("Press '0' to return", WIDTH / 2, 300);
                 }
 
             }
@@ -519,7 +519,7 @@ First one to finish the track in a certain number of laps wins!
                 ctx.fillText("count 4x as fast", WIDTH / 2, 320);
                 ctx.fillText("Complete the laps as quickly as possible and", WIDTH / 2, 390);
                 ctx.fillText("have fun!", WIDTH / 2, 440);
-                ctx.fillText("Press 'BACKSPACE' to return", WIDTH / 2, 540);
+                ctx.fillText("Press '0' to return", WIDTH / 2, 540);
 
             }
 
@@ -530,7 +530,7 @@ First one to finish the track in a certain number of laps wins!
                 ctx.fillText("This game was made by Daniel Papadopoulos", WIDTH / 2, 200);
                 ctx.fillText("June 5th, 2016", WIDTH / 2, 260);
                 ctx.fillText("ICS 3U", WIDTH / 2, 320);
-                ctx.fillText("Press 'BACKSPACE' to return", WIDTH / 2, 540);
+                ctx.fillText("Press '0' to return", WIDTH / 2, 540);
 
             }
 
