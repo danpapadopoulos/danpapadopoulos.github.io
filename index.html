@@ -245,7 +245,7 @@ First one to finish the track in a certain number of laps wins!
                     }
                 }
                 ctx.fillStyle = "blue"; //make P1 car blue
-                ctx.fillRect(-25, -12, 50, 24);
+                ctx.fillRect(-25, -12, 50, 24); //draw P1 car
                 ctx.restore(); //return to the previous state of origin and rotation
             }
 
@@ -270,7 +270,7 @@ First one to finish the track in a certain number of laps wins!
                     }
                 }
                 ctx.fillStyle = "red"; //make P2 car blue
-                ctx.fillRect(-25, -22, 50, 24);
+                ctx.fillRect(-25, -22, 50, 24); //draw P2 car
                 ctx.restore(); //return to the previous state of origin and rotation
             }
 
@@ -352,12 +352,12 @@ First one to finish the track in a certain number of laps wins!
                     drawButton(380, "Start", false);
                     drawButton(450, "Instructions", false);
                     drawButton(520, "Credits", true);
-                } else if (selected > 3) { //go back to selecting first 
+                } else if (selected > 3) { //go back to selecting start 
                     selected = 1;
                     drawButton(380, "Start", false);
                     drawButton(450, "Instructions", false);
                     drawButton(520, "Credits", false);
-                } else if (selected < 1) { //go back to selecting last
+                } else if (selected < 1) { //go back to selecting credits
                     selected = 3;
                     drawButton(380, "Start", false);
                     drawButton(450, "Instructions", false);
@@ -453,32 +453,32 @@ First one to finish the track in a certain number of laps wins!
             }
 
             function updateLap() { //this function makes sure that the lap does not continually update while the player is on the line
-                if (lapP1 === false) {
-                    lapP1 = checkForLap(xP1, yP1);
-                    if (lapP1 === true) {
-                        numLapP1++;
+                if (lapP1 === false) { // if player is not on the line,
+                    lapP1 = checkForLap(xP1, yP1); //check if they are,
+                    if (lapP1 === true) { //if they are now,
+                        numLapP1++; //add one to their lap counter
                     }
-                } else {
-                    lapP1 = checkForLap(xP1, yP1);
+                } else { //if they are on the line,
+                    lapP1 = checkForLap(xP1, yP1); //check if they are off
                 }
-                if (lapP2 === false) {
-                    lapP2 = checkForLap(xP2, yP2);
-                    if (lapP2 === true) {
-                        numLapP2++;
+                if (lapP2 === false) { // if player is not on the line,
+                    lapP2 = checkForLap(xP2, yP2); //check if they are,
+                    if (lapP2 === true) { //if they are now,
+                        numLapP2++; //add one to their lap counter
                     }
-                } else {
-                    lapP2 = checkForLap(xP2, yP2);
+                } else { //if they are on the line,
+                    lapP2 = checkForLap(xP2, yP2); //check if they are off
                 }
 
                 //prints P1's number of completed laps
                 ctx.font = "40px Helvetica";
                 ctx.fillStyle = "blue";
                 ctx.textAlign = "center";
-                ctx.fillText("Lap: " + numLapP1, WIDTH / 2, 40);
+                ctx.fillText("Lap: " + numLapP1, WIDTH / 2, 40); //print the lap number P1
                 
                 //prints P2's number of completed laps
                 ctx.fillStyle = "red";
-                ctx.fillText("Lap: " + numLapP2, WIDTH / 2, 80);
+                ctx.fillText("Lap: " + numLapP2, WIDTH / 2, 80); //print the lap number P2
 
             }
 
@@ -509,6 +509,7 @@ First one to finish the track in a certain number of laps wins!
             }
 
             function generateInstructions() { //text for the instructions screen explaining to the user how to play the game
+                //match the style of other text
                 ctx.font = "30px Helvetica";
                 ctx.fillStyle = "black";
                 ctx.textAlign = "center";
@@ -524,6 +525,7 @@ First one to finish the track in a certain number of laps wins!
             }
 
             function generateCredits() { //text for the credits screen to display the author and date created
+                //match the style of other text
                 ctx.font = "30px Helvetica";
                 ctx.fillStyle = "black";
                 ctx.textAlign = "center";
