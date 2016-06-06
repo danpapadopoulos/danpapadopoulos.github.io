@@ -105,7 +105,10 @@ First one to finish the track in a certain number of laps wins!
                 moveP2 = true; //allow P2 to move
                 stopClockP2 = false; //keep the clock running
                 
-                generateTrack(); //draw the track
+                clear(colourMenu); //clear with menu colour
+                updateMenuLabel(); //show the label
+                updateMenuButtons(); //show the buttons
+                
                 alert("Please use the arrow and enter keys to navigate this menu");
 
                 draw(); //start the draw function
